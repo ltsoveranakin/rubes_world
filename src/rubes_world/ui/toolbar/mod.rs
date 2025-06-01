@@ -1,14 +1,17 @@
+mod object;
+
 use crate::rubes_world::objects::object_type::ObjectType;
 use crate::rubes_world::objects::SpawnObjectEvent;
+use crate::rubes_world::ui::toolbar::object::{ui_object, UIObject};
 use bevy::prelude::*;
 
-pub(super) struct UIObjectPlugin;
+pub(super) struct UIToolbarPlugin;
 
-impl Plugin for UIObjectPlugin {
+impl Plugin for UIToolbarPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<CreateUIObjectEvent>()
             .add_systems(Startup, spawn_default_ui_objects)
-            .add_systems(Update, (listen_create_ui_object, click_ui_object));
+            .add_systems(Update, (listen_spawn_new_ui_object, click_ui_object));
     }
 }
 
@@ -18,7 +21,20 @@ struct CreateUIObjectEvent {
 }
 
 #[derive(Component)]
-struct UIObject;
+struct UIToolbar;
+
+pub(super) fn object_toolbar_ui() -> impl Bundle {
+    (
+        UIToolbar,
+        Node {
+            width: Val::Percent(100.),
+            height: Val::Percent(10.),
+            justify_content: JustifyContent::Center,
+            ..default()
+        },
+        BackgroundColor(Color::srgba_u8(29, 34, 41, 100)),
+    )
+}
 
 fn spawn_default_ui_objects(mut create_ui_object_event: EventWriter<CreateUIObjectEvent>) {
     create_ui_object_event.write(CreateUIObjectEvent {
@@ -26,38 +42,18 @@ fn spawn_default_ui_objects(mut create_ui_object_event: EventWriter<CreateUIObje
     });
 }
 
-fn listen_create_ui_object(
+fn listen_spawn_new_ui_object(
     mut commands: Commands,
+    toolbar_query: Query<Entity, With<UIToolbar>>,
     asset_server: Res<AssetServer>,
     mut create_ui_object_event: EventReader<CreateUIObjectEvent>,
 ) {
     for create_ui_object in create_ui_object_event.read() {
-        commands.spawn((
-            Node {
-                width: Val::Percent(100.),
-                height: Val::Percent(10.),
-                ..default()
-            },
-            BackgroundColor(Color::srgb_u8(23, 28, 41)),
-            children![(
-                UIObject,
-                Node {
-                    width: Val::Percent(10.),
-                    max_height: Val::Percent(100.),
-                    padding: UiRect::bottom(Val::Percent(50.)),
-                    flex_direction: FlexDirection::Column,
-                    aspect_ratio: Some(1.),
-                    ..default()
-                },
-                BackgroundColor(Color::srgb_u8(43, 51, 71)),
-                Button::default(),
-                Interaction::None,
-                children![
-                    (ImageNode::new(asset_server.load("cuboid_placeholder.png")),),
-                    Text::new(&create_ui_object.name)
-                ]
-            )],
-        ));
+        let toolbar_entity = toolbar_query.single().unwrap();
+        commands.entity(toolbar_entity).insert(children![ui_object(
+            asset_server.load("cuboid_placeholder.png"),
+            create_ui_object.name.clone(),
+        )]);
     }
 }
 
