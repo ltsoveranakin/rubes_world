@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::Collider;
 
+#[derive(Component, Copy, Clone)]
 pub(crate) enum ObjectType {
     Cuboid(Vec3),
 }

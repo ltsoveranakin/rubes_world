@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 bevy = "0.16.0"
 bevy_dylib = { version = "0.16.0-rc.3" }
+bevy-inspector-egui = "0.31.0"
 
 
 bevy_rapier3d = { version = "0.30.0", features = ["enhanced-determinism", "debug-render-3d"] }

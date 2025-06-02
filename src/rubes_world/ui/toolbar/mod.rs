@@ -3,6 +3,7 @@ mod object;
 use crate::rubes_world::objects::object_type::ObjectType;
 use crate::rubes_world::objects::SpawnObjectEvent;
 use crate::rubes_world::ui::toolbar::object::{ui_object, UIObject};
+use crate::rubes_world::ui::UI_OVERLAY_COLOR;
 use bevy::prelude::*;
 
 pub(super) struct UIToolbarPlugin;
@@ -32,7 +33,8 @@ pub(super) fn object_toolbar_ui() -> impl Bundle {
             justify_content: JustifyContent::Center,
             ..default()
         },
-        BackgroundColor(Color::srgba_u8(29, 34, 41, 100)),
+        Name::new("UI Toolbar"),
+        BackgroundColor(UI_OVERLAY_COLOR),
     )
 }
 

@@ -1,9 +1,12 @@
 mod object_selector;
 
+mod checkbox;
 mod toolbar;
 
-use crate::rubes_world::ui::object_selector::UIObjectSelectorPlugin;
+use crate::rubes_world::ui::object_selector::{object_selector_ui, UIObjectSelectorPlugin};
+use std::convert::Into;
 
+use crate::rubes_world::ui::checkbox::CheckBoxPlugin;
 use crate::rubes_world::ui::toolbar::{object_toolbar_ui, UIToolbarPlugin};
 use bevy::prelude::*;
 use bevy::window::SystemCursorIcon;
@@ -13,11 +16,13 @@ pub(super) struct GameUIPlugin;
 
 impl Plugin for GameUIPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((UIToolbarPlugin, UIObjectSelectorPlugin))
+        app.add_plugins((UIToolbarPlugin, UIObjectSelectorPlugin, CheckBoxPlugin))
             .add_systems(Startup, spawn_ui)
             .add_systems(Update, ui_element_hovered);
     }
 }
+
+pub(super) const UI_OVERLAY_COLOR: Color = Color::srgba_u8(29, 34, 41, 100);
 
 fn spawn_ui(mut commands: Commands) {
     commands.spawn((
@@ -27,8 +32,9 @@ fn spawn_ui(mut commands: Commands) {
             flex_direction: FlexDirection::Column,
             ..default()
         },
+        Name::new("UI Root"),
         // BackgroundColor(Color::Srgba(Srgba::RED)),
-        children![object_toolbar_ui()],
+        children![object_toolbar_ui(), object_selector_ui()],
     ));
     // commands.spawn(object_toolbar_ui());
 }
