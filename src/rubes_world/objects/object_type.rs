@@ -7,15 +7,18 @@ pub(crate) enum ObjectType {
 }
 
 impl ObjectType {
-    pub(super) fn get_collider_with_mesh(&self) -> (Collider, Mesh) {
+    pub(super) fn get_collider(&self) -> Collider {
         match self {
-            Self::Cuboid(dimensions) => (
-                Collider::cuboid(dimensions.x, dimensions.y, dimensions.z),
-                Cuboid {
-                    half_size: *dimensions,
-                }
-                .into(),
-            ),
+            Self::Cuboid(dim) => Collider::cuboid(dim.x, dim.y, dim.z),
+        }
+    }
+
+    pub(super) fn get_mesh(&self) -> Mesh {
+        match self {
+            Self::Cuboid(dimensions) => Cuboid {
+                half_size: *dimensions,
+            }
+            .into(),
         }
     }
 }

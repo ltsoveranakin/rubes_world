@@ -1,6 +1,8 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 
+const CAMERA_SENSITIVITY: f32 = 0.005;
+
 pub(super) struct GameCameraPlugin;
 
 impl Plugin for GameCameraPlugin {
@@ -32,7 +34,8 @@ fn mouse_moved(
     for mouse_motion in mouse_motion_event.read() {
         let mut camera_transform = camera_transform_query.single_mut().unwrap();
         if mouse_input.pressed(MouseButton::Middle) {
-            camera_transform.rotate_y(mouse_motion.delta.y * 0.01);
+            // camera_transform.rotate_z(mouse_motion.delta.y * CAMERA_SENSITIVITY);
+            camera_transform.rotate_y(mouse_motion.delta.x * CAMERA_SENSITIVITY);
         }
     }
 }

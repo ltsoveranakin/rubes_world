@@ -32,7 +32,9 @@ fn listen_spawn_object(
     mut spawn_object_event: EventReader<SpawnObjectEvent>,
 ) {
     for spawn_object in spawn_object_event.read() {
-        let (collider, mesh) = spawn_object.object_type.get_collider_with_mesh();
+        let object_type = &spawn_object.object_type;
+        let collider = object_type.get_collider();
+        let mesh = object_type.get_mesh();
 
         commands.spawn((
             collider,

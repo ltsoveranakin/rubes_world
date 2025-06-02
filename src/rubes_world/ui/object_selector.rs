@@ -30,7 +30,7 @@ pub(super) fn object_selector_ui() -> impl Bundle {
         },
         Name::new("UI Object Selector"),
         BackgroundColor(UI_OVERLAY_COLOR),
-        children![CheckBox(false)],
+        children![CheckBox(false), Text::new("Dynamic")],
     )
 }
 

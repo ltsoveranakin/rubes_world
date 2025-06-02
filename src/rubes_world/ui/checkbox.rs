@@ -9,10 +9,12 @@ impl Plugin for CheckBoxPlugin {
 }
 
 fn checkbox_node() -> Node {
+    let size = Val::Px(20.);
     Node {
-        width: Val::Px(10.),
-        height: Val::Px(10.),
-        border: UiRect::all(Val::Px(4.)),
+        width: size,
+        height: size,
+        border: UiRect::all(Val::Px(3.)),
+        margin: UiRect::all(Val::Px(10.)),
         ..default()
     }
 }
@@ -26,25 +28,24 @@ fn checkbox_name() -> Name {
 }
 
 #[derive(Component)]
-#[require(Node = checkbox_node(), BorderColor = checkbox_border_color(), Name = checkbox_name(), Button)]
+#[require(ImageNode, Node = checkbox_node(), BorderColor = checkbox_border_color(), Name = checkbox_name(), Button)]
 pub(super) struct CheckBox(pub(super) bool);
 
 fn checkbox_click(
     mut check_box_query: Query<
-        (&mut CheckBox, &mut BackgroundColor, &Interaction),
+        (&mut CheckBox, &mut ImageNode, &Interaction),
         Or<(Changed<Interaction>, Changed<CheckBox>)>,
     >,
+    asset_server: Res<AssetServer>,
 ) {
-    for (mut check_box, mut background_color, interaction) in check_box_query.iter_mut() {
+    for (mut check_box, mut image_node, interaction) in check_box_query.iter_mut() {
         if interaction == &Interaction::Pressed {
             let check_value = check_box.0;
             check_box.0 = !check_value;
         }
-        background_color.0 = if check_box.0 {
-            Srgba::BLACK
-        } else {
-            Srgba::WHITE
-        }
-        .into();
+
+        let img_name = if check_box.0 { "checkmark" } else { "x-icon" };
+
+        image_node.image = asset_server.load(format!("images/ui/{}.png", img_name));
     }
 }
