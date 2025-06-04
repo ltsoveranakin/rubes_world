@@ -27,7 +27,6 @@ struct UIToolbar;
 
 pub(super) fn object_toolbar_ui() -> impl Bundle {
     (
-        
         UIToolbar,
         Node {
             width: Val::Percent(100.),
@@ -36,7 +35,8 @@ pub(super) fn object_toolbar_ui() -> impl Bundle {
             ..default()
         },
         Name::new("UI Toolbar"),
-        BackgroundColor(UI_OVERLAY_COLOR),UIMouseBlock,
+        BackgroundColor(UI_OVERLAY_COLOR),
+        UIMouseBlock,
     )
 }
 
@@ -47,8 +47,13 @@ fn spawn_default_ui_objects(mut create_ui_object_event: EventWriter<CreateUIObje
     });
 
     create_ui_object_event.write(CreateUIObjectEvent {
-        name: "Plane(ish)".into(),
-        object_type: ObjectType::Cuboid(Vec3::new(10., 1., 10.)),
+        name: "Base".into(),
+        object_type: ObjectType::Cuboid(Vec3::new(10., 0.2, 10.)),
+    });
+
+    create_ui_object_event.write(CreateUIObjectEvent {
+        name: "Sphere".into(),
+        object_type: ObjectType::Sphere(0.5),
     });
 }
 
