@@ -1,9 +1,15 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::Collider;
 
-#[derive(Component, Copy, Clone)]
+#[derive(Component, Reflect, Copy, Clone, Debug)]
 pub(crate) enum ObjectType {
     Cuboid(Vec3),
+}
+
+impl Default for ObjectType {
+    fn default() -> Self {
+        Self::Cuboid(Vec3::splat(0.5))
+    }
 }
 
 impl ObjectType {
@@ -15,10 +21,7 @@ impl ObjectType {
 
     pub(super) fn get_mesh(&self) -> Mesh {
         match self {
-            Self::Cuboid(dimensions) => Cuboid {
-                half_size: *dimensions,
-            }
-            .into(),
+            Self::Cuboid(dim) => Cuboid { half_size: *dim }.into(),
         }
     }
 }
