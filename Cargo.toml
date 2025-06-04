@@ -10,6 +10,7 @@ bevy-inspector-egui = "0.31.0"
 bevy_rapier3d = { version = "0.30.0", features = ["enhanced-determinism", "debug-render-3d"] }
 bevy_panorbit_camera = "0.26.0"
 bevy_simple_text_input = "0.11.1"
+transform-gizmo-bevy = "0.6.0"
 
 [profile.dev]
 opt-level = 1
