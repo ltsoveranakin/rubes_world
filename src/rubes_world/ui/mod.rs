@@ -7,6 +7,7 @@ mod toolbar;
 use crate::rubes_world::ui::checkbox::CheckBoxPlugin;
 use crate::rubes_world::ui::object_selector::{ObjectSelectorUI, UIObjectSelectorPlugin};
 use crate::rubes_world::ui::toolbar::{object_toolbar_ui, UIToolbarPlugin};
+use bevy::ecs::relationship::RelatedSpawnerCommands;
 use bevy::input::mouse::MouseButtonInput;
 use bevy::prelude::*;
 use bevy::window::SystemCursorIcon;
@@ -41,6 +42,8 @@ impl Plugin for GameUIPlugin {
             );
     }
 }
+
+pub(super) type Parent<'a, 'w> = &'a mut RelatedSpawnerCommands<'w, ChildOf>;
 
 #[derive(Component)]
 #[require(Interaction::None)]

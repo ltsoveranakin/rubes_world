@@ -1,7 +1,7 @@
 use crate::rubes_world::objects::object_type::ObjectType;
 use crate::rubes_world::objects::{ModifySelectedObjectEvent, SelectedObject};
 use crate::rubes_world::ui::field::{field_check_box, field_text};
-use crate::rubes_world::ui::{UIMouseBlock, UIRoot, UI_OVERLAY_COLOR};
+use crate::rubes_world::ui::{Parent, UIMouseBlock, UIRoot, UI_OVERLAY_COLOR};
 use bevy::prelude::*;
 use bevy_simple_text_input::TextInputValue;
 
@@ -27,47 +27,53 @@ pub(super) struct ObjectInput {
     pub(super) label_name: String,
 }
 
-pub(super) fn object_selector_ui(object_type: ObjectType) -> impl Bundle {
-    (
-        ObjectSelectorUI,
-        Node {
-            width: Val::Percent(30.),
-            height: Val::Percent(100.),
-            align_self: AlignSelf::End,
-            display: Display::Flex,
-
-            ..default()
-        },
-        BackgroundColor(UI_OVERLAY_COLOR),
-        Name::new("UI Object Selector"),
-        UIMouseBlock,
-        selector_content(object_type),
-    )
-}
-
-fn selector_content(object_type: ObjectType) -> impl Bundle {
-    (children![
-        field_check_box("Dynamic", false),
-        (
-            object_specific_ui(object_type),
-            Name::new("Object Specific")
-        )
-    ],)
-}
-
-fn object_specific_ui(object_type: ObjectType) -> impl Bundle {
-    match object_type {
-        ObjectType::Cuboid(dim) => (
+pub(super) fn object_selector_ui(parent: Parent, object_type: ObjectType) {
+    parent
+        .spawn((
+            ObjectSelectorUI,
             Node {
-                flex_direction: FlexDirection::Column,
+                width: Val::Percent(30.),
+                height: Val::Percent(100.),
+                align_self: AlignSelf::End,
+                display: Display::Flex,
+
                 ..default()
             },
-            children![
-                field_text("width", dim.x.to_string(), object_type),
-                field_text("height", dim.y.to_string(), object_type),
-                field_text("length", dim.z.to_string(), object_type)
-            ],
-        ),
+            BackgroundColor(UI_OVERLAY_COLOR),
+            Name::new("UI Object Selector"),
+            UIMouseBlock,
+        ))
+        .with_children(|parent| {
+            selector_content(parent, object_type);
+        });
+}
+
+fn selector_content(parent: Parent, object_type: ObjectType) {
+    parent.spawn(field_check_box("Dynamic", false));
+    object_specific_ui(parent, object_type);
+}
+
+fn object_specific_ui(parent: Parent, object_type: ObjectType) {
+    match object_type {
+        ObjectType::Cuboid(dim) => {
+            parent.spawn((
+                Node {
+                    flex_direction: FlexDirection::Column,
+                    ..default()
+                },
+                children![
+                    field_text("width", dim.x.to_string()),
+                    field_text("height", dim.y.to_string()),
+                    field_text("length", dim.z.to_string(),)
+                ],
+            ));
+        }
+        ObjectType::Sphere(radius) => {
+            parent.spawn((
+                Node::default(),
+                children![field_text("radius", radius.to_string()),],
+            ));
+        }
     }
 }
 
@@ -77,7 +83,7 @@ fn set_object_specific_properties(
     selected_object: Res<SelectedObject>,
     mut modify_selected_object_event: EventWriter<ModifySelectedObjectEvent>,
 ) {
-    for (mut object_input, text_input_value) in object_input_query.iter_mut() {
+    for (object_input, text_input_value) in object_input_query.iter_mut() {
         if let Some(selected_object_entity) = selected_object.0 {
             let mut selected_object_type = selected_object_query
                 .get_mut(selected_object_entity)
@@ -92,6 +98,10 @@ fn set_object_specific_properties(
                     "length" => dim.z = input_parsed,
                     _ => {}
                 },
+
+                ObjectType::Sphere(radius) => {
+                    *radius = input_parsed;
+                }
             }
 
             // info!("Obj type: {:?}", object_type);
@@ -117,8 +127,8 @@ fn update_selector_ui(
         let ui_root_entity = ui_root_query.single().unwrap();
         let object_type = *object_query.get(selected_object_entity).unwrap();
 
-        commands
-            .entity(ui_root_entity)
-            .with_child(object_selector_ui(object_type));
+        commands.entity(ui_root_entity).with_children(|parent| {
+            object_selector_ui(parent, object_type);
+        });
     }
 }
