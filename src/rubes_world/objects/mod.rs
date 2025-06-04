@@ -55,6 +55,7 @@ fn listen_spawn_object(
 
         commands.spawn((
             collider,
+            RigidBody::Fixed,
             spawn_object.object_type,
             Mesh3d(meshes.add(mesh)),
             MeshMaterial3d(materials.add(Color::srgb_u8(227, 46, 14))),

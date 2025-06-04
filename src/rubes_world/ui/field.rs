@@ -7,7 +7,7 @@ use bevy_simple_text_input::*;
 pub(super) fn field_input(label_name: impl Into<String>, input_bundle: impl Bundle) -> impl Bundle {
     (
         Node::default(),
-        Name::new("Field"),
+        Name::new("Field Parent"),
         children![
             (Text::new(label_name), Name::new("Field(Label)")),
             input_bundle
@@ -46,6 +46,24 @@ pub(super) fn field_text(label_name: impl Into<String>, value: String) -> impl B
     )
 }
 
-pub(super) fn field_check_box(label_name: impl Into<String>, value: bool) -> impl Bundle {
-    field_input(label_name, CheckBox(value));
+pub(super) fn field_check_box(
+    label_name: impl Into<String>,
+    value: bool,
+    bundle: impl Bundle,
+) -> impl Bundle {
+    field_input(
+        label_name,
+        (
+            Node {
+                width: Val::Px(10.),
+                height: Val::Px(10.),
+                border: UiRect::all(Val::Px(3.)),
+                margin: UiRect::all(Val::Px(10.)),
+                ..default()
+            },
+            CheckBox(value),
+            Name::new("CheckBox"),
+            bundle,
+        ),
+    )
 }

@@ -1,8 +1,10 @@
 use crate::rubes_world::objects::object_type::ObjectType;
 use crate::rubes_world::objects::{ModifySelectedObjectEvent, SelectedObject};
+use crate::rubes_world::ui::checkbox::CheckBox;
 use crate::rubes_world::ui::field::{field_check_box, field_text};
 use crate::rubes_world::ui::{Parent, UIMouseBlock, UIRoot, UI_OVERLAY_COLOR};
 use bevy::prelude::*;
+use bevy_rapier3d::prelude::*;
 use bevy_simple_text_input::TextInputValue;
 
 pub(super) struct UIObjectSelectorPlugin;
@@ -14,6 +16,7 @@ impl Plugin for UIObjectSelectorPlugin {
             (
                 update_selector_ui.run_if(resource_changed::<SelectedObject>),
                 set_object_specific_properties,
+                update_object_dynamic,
             ),
         );
     }
@@ -27,6 +30,9 @@ pub(super) struct ObjectInput {
     pub(super) label_name: String,
 }
 
+#[derive(Component)]
+struct DynamicCheckBox;
+
 pub(super) fn object_selector_ui(parent: Parent, object_type: ObjectType) {
     parent
         .spawn((
@@ -36,7 +42,7 @@ pub(super) fn object_selector_ui(parent: Parent, object_type: ObjectType) {
                 height: Val::Percent(100.),
                 align_self: AlignSelf::End,
                 display: Display::Flex,
-
+                flex_direction: FlexDirection::Column,
                 ..default()
             },
             BackgroundColor(UI_OVERLAY_COLOR),
@@ -49,7 +55,7 @@ pub(super) fn object_selector_ui(parent: Parent, object_type: ObjectType) {
 }
 
 fn selector_content(parent: Parent, object_type: ObjectType) {
-    parent.spawn(field_check_box("Dynamic", false));
+    parent.spawn(field_check_box("Dynamic", false, DynamicCheckBox));
     object_specific_ui(parent, object_type);
 }
 
@@ -130,5 +136,21 @@ fn update_selector_ui(
         commands.entity(ui_root_entity).with_children(|parent| {
             object_selector_ui(parent, object_type);
         });
+    }
+}
+
+fn update_object_dynamic(
+    mut commands: Commands,
+    dynamic_check_box_query: Query<&CheckBox, (Changed<CheckBox>, With<DynamicCheckBox>)>,
+    selected_object: Res<SelectedObject>,
+) {
+    for checkbox in dynamic_check_box_query.iter() {
+        let mut commands = commands.entity(selected_object.0.unwrap());
+
+        if checkbox.0 {
+            commands.insert(RigidBody::Dynamic);
+        } else {
+            commands.insert(RigidBody::Fixed);
+        }
     }
 }

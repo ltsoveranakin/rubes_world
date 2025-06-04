@@ -8,27 +8,12 @@ impl Plugin for CheckBoxPlugin {
     }
 }
 
-fn checkbox_node() -> Node {
-    let size = Val::Px(20.);
-    Node {
-        width: size,
-        height: size,
-        border: UiRect::all(Val::Px(3.)),
-        margin: UiRect::all(Val::Px(10.)),
-        ..default()
-    }
-}
-
 fn checkbox_border_color() -> BorderColor {
     Srgba::BLACK.into()
 }
 
-fn checkbox_name() -> Name {
-    Name::new("CheckBox")
-}
-
 #[derive(Component)]
-#[require(ImageNode, Node = checkbox_node(), BorderColor = checkbox_border_color(), Name = checkbox_name(), Button)]
+#[require(ImageNode, BorderColor = checkbox_border_color(), Button)]
 pub(super) struct CheckBox(pub(super) bool);
 
 fn checkbox_click(
