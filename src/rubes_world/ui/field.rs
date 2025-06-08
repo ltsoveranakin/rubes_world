@@ -1,5 +1,5 @@
 use crate::rubes_world::ui::checkbox::CheckBox;
-use crate::rubes_world::ui::object_selector::ObjectInput;
+use crate::rubes_world::ui::object_selector::FieldText;
 use crate::rubes_world::ui::{BACKGROUND_COLOR, BORDER_COLOR_ACTIVE, TEXT_COLOR};
 use bevy::prelude::*;
 use bevy_simple_text_input::*;
@@ -29,6 +29,7 @@ pub(super) fn field_text(label_name: impl Into<String>, value: String) -> impl B
             BorderColor(BORDER_COLOR_ACTIVE),
             BackgroundColor(BACKGROUND_COLOR),
             TextInput,
+            FieldText { label_name },
             TextInputTextFont(TextFont {
                 font_size: 10.,
                 ..default()
@@ -40,7 +41,6 @@ pub(super) fn field_text(label_name: impl Into<String>, value: String) -> impl B
                 retain_on_submit: true,
                 ..default()
             },
-            ObjectInput { label_name },
             Name::new("Field(Text Input)"),
         ),
     )

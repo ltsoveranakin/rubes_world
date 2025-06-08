@@ -42,18 +42,18 @@ pub(super) fn object_toolbar_ui() -> impl Bundle {
 
 fn spawn_default_ui_objects(mut create_ui_object_event: EventWriter<CreateUIObjectEvent>) {
     create_ui_object_event.write(CreateUIObjectEvent {
-        name: "Cube".into(),
-        object_type: ObjectType::Cuboid(Vec3::splat(0.5)),
+        name: "Square".into(),
+        object_type: ObjectType::Rectangle(Vec2::splat(5.)),
     });
 
     create_ui_object_event.write(CreateUIObjectEvent {
         name: "Base".into(),
-        object_type: ObjectType::Cuboid(Vec3::new(10., 0.2, 10.)),
+        object_type: ObjectType::Rectangle(Vec2::new(10., 0.2)),
     });
 
     create_ui_object_event.write(CreateUIObjectEvent {
-        name: "Sphere".into(),
-        object_type: ObjectType::Sphere(0.5),
+        name: "Circle".into(),
+        object_type: ObjectType::Circle(5.),
     });
 }
 

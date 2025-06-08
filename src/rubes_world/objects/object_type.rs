@@ -1,30 +1,30 @@
 use bevy::prelude::*;
-use bevy_rapier3d::prelude::Collider;
+use bevy_rapier2d::prelude::*;
 
 #[derive(Component, Reflect, Copy, Clone, Debug)]
 pub(crate) enum ObjectType {
-    Cuboid(Vec3),
-    Sphere(f32),
+    Rectangle(Vec2),
+    Circle(f32),
 }
 
 impl Default for ObjectType {
     fn default() -> Self {
-        Self::Cuboid(Vec3::splat(0.5))
+        Self::Rectangle(Vec2::splat(5.))
     }
 }
 
 impl ObjectType {
     pub(super) fn get_collider(&self) -> Collider {
         match self {
-            Self::Cuboid(dim) => Collider::cuboid(dim.x, dim.y, dim.z),
-            Self::Sphere(radius) => Collider::ball(*radius),
+            Self::Rectangle(dim) => Collider::cuboid(dim.x, dim.y),
+            Self::Circle(radius) => Collider::ball(*radius),
         }
     }
 
     pub(super) fn get_mesh(&self) -> Mesh {
         match self {
-            Self::Cuboid(dim) => Cuboid { half_size: *dim }.into(),
-            Self::Sphere(radius) => Sphere { radius: *radius }.into(),
+            Self::Rectangle(dim) => Rectangle { half_size: *dim }.into(),
+            Self::Circle(radius) => Circle { radius: *radius }.into(),
         }
     }
 }

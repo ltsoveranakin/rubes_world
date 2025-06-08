@@ -1,12 +1,10 @@
 pub(crate) mod object_type;
 
-use crate::rubes_world::objects::object_type::ObjectType;
-use bevy::input::mouse::MouseButtonInput;
-use bevy::prelude::*;
-
 use crate::rubes_world::camera::GameCamera;
+use crate::rubes_world::objects::object_type::ObjectType;
 use crate::rubes_world::ui::MouseBlockSafeEvent;
-use bevy_rapier3d::prelude::*;
+use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 pub(super) struct ObjectPlugin;
 
@@ -45,7 +43,7 @@ struct CurrentSelectedObject;
 fn listen_spawn_object(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
     mut spawn_object_event: EventReader<SpawnObjectEvent>,
 ) {
     for spawn_object in spawn_object_event.read() {
@@ -55,10 +53,10 @@ fn listen_spawn_object(
 
         commands.spawn((
             collider,
-            RigidBody::Fixed,
             spawn_object.object_type,
-            Mesh3d(meshes.add(mesh)),
-            MeshMaterial3d(materials.add(Color::srgb_u8(227, 46, 14))),
+            RigidBody::Fixed,
+            Mesh2d(meshes.add(mesh)),
+            MeshMaterial2d(materials.add(Color::srgb_u8(227, 46, 14))),
         ));
     }
 }
@@ -77,24 +75,23 @@ fn left_click_sel_object(
             let window = window_query.single().unwrap();
 
             if let Some(cursor_position) = window.cursor_position() {
-                if let Ok(ray) = camera.viewport_to_world(camera_global_transform, cursor_position)
+                if let Ok(ray) =
+                    camera.viewport_to_world_2d(camera_global_transform, cursor_position)
                 {
-                    let ray_pos = ray.origin;
-                    let ray_dir = ray.direction.into();
-                    let max_toi = f32::MAX.into();
-                    let solid = true;
+                    let ray_pos = ray;
                     let filter = QueryFilter::default();
-
                     let ctx = rapier_context.single().unwrap();
 
-                    selected_object.0 = if let Some((entity, _)) =
-                        ctx.cast_ray(ray_pos, ray_dir, max_toi, solid, filter)
-                    {
-                        info!("select: {}", entity);
-                        Some(entity)
-                    } else {
-                        info!("Miss entity");
-                        None
+                    let mut intersected = false;
+
+                    ctx.intersections_with_point(ray_pos, filter, |entity| {
+                        intersected = true;
+                        selected_object.0 = Some(entity);
+                        false
+                    });
+
+                    if !intersected {
+                        selected_object.0 = None;
                     }
                 }
             }
@@ -110,26 +107,26 @@ fn update_selected_object(
     if let Ok(current_selected_object_entity) = current_selected_object_query.single() {
         commands
             .entity(current_selected_object_entity)
-            .remove::<CurrentSelectedObject>();
+            .remove::<(CurrentSelectedObject)>();
     }
 
     if let Some(selected_object_entity) = selected_object.0 {
         commands
             .entity(selected_object_entity)
-            .insert(CurrentSelectedObject);
+            .insert((CurrentSelectedObject));
     }
 }
 
 fn listen_modify_selected_object(
     mut commands: Commands,
-    mut selected_object_query: Query<(Entity, &ObjectType, &mut Mesh3d)>,
+    mut selected_object_query: Query<(Entity, &ObjectType, &mut Mesh2d)>,
     selected_object: Res<SelectedObject>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut modify_selected_object_event: EventReader<ModifySelectedObjectEvent>,
 ) {
     for _ in modify_selected_object_event.read() {
         if let Some(selected_object_entity) = selected_object.0 {
-            let (entity, object_type, mut mesh_3d) = selected_object_query
+            let (entity, object_type, mut mesh_2d) = selected_object_query
                 .get_mut(selected_object_entity)
                 .unwrap();
 
@@ -138,7 +135,7 @@ fn listen_modify_selected_object(
 
             commands.entity(entity).insert(collider);
 
-            mesh_3d.0 = meshes.add(mesh);
+            mesh_2d.0 = meshes.add(mesh);
         }
     }
 }
