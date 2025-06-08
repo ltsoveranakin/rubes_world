@@ -6,7 +6,7 @@ pub(super) struct GameCameraPlugin;
 impl Plugin for GameCameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, spawn_camera)
-            .add_systems(Update, scroll_camera);
+            .add_systems(Update, (scroll_camera));
     }
 }
 
@@ -16,6 +16,10 @@ pub(crate) struct GameCamera;
 fn spawn_camera(mut commands: Commands, mut ambient_light: ResMut<AmbientLight>) {
     commands.spawn((
         Camera2d::default(),
+        Projection::Orthographic(OrthographicProjection {
+            scale: 0.1,
+            ..OrthographicProjection::default_2d()
+        }),
         Transform::from_xyz(0., 0., 0.),
         GameCamera,
         IsDefaultUiCamera,

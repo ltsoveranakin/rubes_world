@@ -43,7 +43,7 @@ pub(super) fn object_toolbar_ui() -> impl Bundle {
 fn spawn_default_ui_objects(mut create_ui_object_event: EventWriter<CreateUIObjectEvent>) {
     create_ui_object_event.write(CreateUIObjectEvent {
         name: "Square".into(),
-        object_type: ObjectType::Rectangle(Vec2::splat(5.)),
+        object_type: ObjectType::Rectangle(Vec2::splat(1.)),
     });
 
     create_ui_object_event.write(CreateUIObjectEvent {
@@ -53,7 +53,7 @@ fn spawn_default_ui_objects(mut create_ui_object_event: EventWriter<CreateUIObje
 
     create_ui_object_event.write(CreateUIObjectEvent {
         name: "Circle".into(),
-        object_type: ObjectType::Circle(5.),
+        object_type: ObjectType::Circle(1.),
     });
 }
 
